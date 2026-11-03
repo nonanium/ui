@@ -37,8 +37,8 @@ jobs:
 
           test -f "$PACKAGE"
 
-          if ! gh release view "$TAG" > /dev/null 2>&1; then
-            gh release create "$TAG" --target "$SHA" --title "$TAG" --notes "This is an automated release."
-          fi
-
-          gh release upload "$TAG" "$PACKAGE" --clobber
+          sha256sum "$PACKAGE" > SHA256SUMS
+          git tag "$TAG" "$SHA"
+          git push origin "refs/tags/$TAG"
+          gh release create "$TAG" "$PACKAGE" SHA256SUMS \
+            --verify-tag --title "$TAG" --notes "Source commit: $SHA. Artifact digest: SHA256SUMS."
