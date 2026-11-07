@@ -37,8 +37,40 @@ jobs:
 
           test -f "$PACKAGE"
 
-          sha256sum "$PACKAGE" > SHA256SUMS
-          git tag "$TAG" "$SHA"
-          git push origin "refs/tags/$TAG"
-          gh release create "$TAG" "$PACKAGE" SHA256SUMS \
-            --verify-tag --title "$TAG" --notes "Source commit: $SHA. Artifact digest: SHA256SUMS."
+          git fetch origin --tags
+          if git rev-parse --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+            test "$(git rev-parse "$TAG^{commit}")" = "$SHA"
+          else
+            git tag "$TAG" "$SHA"
+            git push origin "refs/tags/$TAG"
+          fi
+
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --draft --verify-tag --title "$TAG" \
+              --notes "Source commit: $SHA. Artifact digest: SHA256SUMS."
+          fi
+
+          artifact_dir="$(mktemp -d)"
+          trap 'rm -rf "$artifact_dir"' EXIT
+          assets="$(gh release view "$TAG" --json assets --jq '.assets[].name')"
+          if printf '%s\n' "$assets" | grep -Fxq "$PACKAGE"; then
+            gh release download "$TAG" --pattern "$PACKAGE" --dir "$artifact_dir"
+          else
+            cp "$PACKAGE" "$artifact_dir/$PACKAGE"
+          fi
+          if printf '%s\n' "$assets" | grep -Fxq SHA256SUMS; then
+            gh release download "$TAG" --pattern SHA256SUMS --dir "$artifact_dir"
+          else
+            (cd "$artifact_dir" && sha256sum "$PACKAGE" > SHA256SUMS)
+          fi
+          (cd "$artifact_dir" && sha256sum --check SHA256SUMS)
+
+          if ! printf '%s\n' "$assets" | grep -Fxq "$PACKAGE"; then
+            gh release upload "$TAG" "$artifact_dir/$PACKAGE"
+          fi
+          if ! printf '%s\n' "$assets" | grep -Fxq SHA256SUMS; then
+            gh release upload "$TAG" "$artifact_dir/SHA256SUMS"
+          fi
+          if test "$(gh release view "$TAG" --json isDraft --jq '.isDraft')" = true; then
+            gh release edit "$TAG" --draft=false
+          fi
