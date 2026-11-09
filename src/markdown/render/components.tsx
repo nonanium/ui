@@ -245,7 +245,7 @@ function MarkdownImage({
     <img
       {...props}
       className={cn(
-        "my-5 h-auto max-w-full rounded-lg group-data-[variant=compact]/markdown:my-2",
+        "my-5 h-auto max-w-full rounded-lg group-data-[variant=compact]/markdown:my-2 group-data-[variant=compact]/markdown:max-h-72 group-data-[variant=compact]/markdown:max-w-[min(100%,28rem)] group-data-[variant=compact]/markdown:object-contain",
         className,
       )}
       alt={alt ?? ""}
