@@ -20,6 +20,8 @@ import {
   MarkdownH6,
   MarkdownHorizontalRule,
   MarkdownImage,
+  MarkdownImageContext,
+  type MarkdownImageRenderer,
   MarkdownInlineCode,
   MarkdownInput,
   MarkdownLink,
@@ -46,6 +48,7 @@ export type MarkdownProps = Omit<ComponentProps<"div">, "children"> & {
   content: string;
   components?: Partial<MarkdownComponents>;
   registry?: EmojiRegistry;
+  renderImage?: MarkdownImageRenderer;
   theme?: MarkdownTheme;
   trailingContent?: ReactNode;
   variant?: MarkdownVariant;
@@ -136,6 +139,7 @@ function Markdown({
   className,
   components,
   registry: registryOverride,
+  renderImage,
   theme,
   trailingContent,
   variant = "article",
@@ -165,14 +169,16 @@ function Markdown({
           className,
         )}
       >
-        <ReactMarkdown
-          skipHtml
-          remarkPlugins={remarkPlugins}
-          rehypePlugins={rehypePlugins}
-          components={{ ...defaultComponents, ...components }}
-        >
-          {content}
-        </ReactMarkdown>
+        <MarkdownImageContext value={renderImage}>
+          <ReactMarkdown
+            skipHtml
+            remarkPlugins={remarkPlugins}
+            rehypePlugins={rehypePlugins}
+            components={{ ...defaultComponents, ...components }}
+          >
+            {content}
+          </ReactMarkdown>
+        </MarkdownImageContext>
         {trailingContent}
       </div>
     </EmojiProvider>

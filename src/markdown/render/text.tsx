@@ -1,11 +1,12 @@
 import type { CSSProperties } from "react";
 
 import type { EmojiRegistry } from "../emoji/registry";
-import { Markdown } from "./markdown";
+import { Markdown, type MarkdownProps } from "./markdown";
 
 export type TextProps = {
   fontSize?: CSSProperties["fontSize"];
   registry?: EmojiRegistry;
+  renderImage?: MarkdownProps["renderImage"];
   showEditedIndicator?: boolean;
   value: string;
 };
@@ -13,6 +14,7 @@ export type TextProps = {
 export default function Text({
   fontSize,
   registry,
+  renderImage,
   showEditedIndicator = false,
   value,
 }: TextProps) {
@@ -25,6 +27,7 @@ export default function Text({
       }
       content={value}
       registry={registry}
+      renderImage={renderImage}
       trailingContent={
         showEditedIndicator ? (
           <span className="ms-1 text-xs text-muted-foreground">(edited)</span>

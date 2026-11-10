@@ -1,4 +1,5 @@
 export { Markdown } from "./render/markdown";
+export type { MarkdownImageRenderer } from "./render/components";
 export type {
   MarkdownComponents,
   MarkdownProps,
