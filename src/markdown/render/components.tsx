@@ -1,4 +1,11 @@
-import { useEffect, useState, type ComponentProps } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import type { ExtraProps } from "react-markdown";
 
 import { cn } from "../../lib/utils";
@@ -224,12 +231,23 @@ function MarkdownInput({
   return <input className={cn("accent-primary", className)} {...props} />;
 }
 
+export type MarkdownImageRenderer = (props: {
+  src: string;
+  alt: string;
+  title?: string;
+}) => ReactNode;
+
+export const MarkdownImageContext = createContext<
+  MarkdownImageRenderer | undefined
+>(undefined);
+
 function MarkdownImage({
   node,
   className,
   alt,
   ...props
 }: MarkdownElementProps<"img">) {
+  const renderImage = useContext(MarkdownImageContext);
   const emojiShortcode = node?.properties.dataEmoji;
   if (typeof emojiShortcode === "string") {
     return (
@@ -240,6 +258,10 @@ function MarkdownImage({
     );
   }
   if (!props.src) return alt ? <span>{alt}</span> : null;
+
+  if (renderImage && typeof props.src === "string") {
+    return renderImage({ src: props.src, alt: alt ?? "", title: props.title });
+  }
 
   return (
     <img
