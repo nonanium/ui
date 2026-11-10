@@ -155,7 +155,7 @@
 
   .cm-editor.tm-md-editor .cm-content {
     min-height: 2rem;
-    padding: var(--tm-md-content-padding, 0.25rem 0.625rem);
+    padding: var(--tm-md-content-padding, 0.25rem 0.625rem) !important;
     caret-color: var(--foreground) !important;
   }
 
