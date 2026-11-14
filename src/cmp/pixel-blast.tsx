@@ -139,11 +139,15 @@ precision highp float;
 uniform vec3  uColor;
 uniform vec2  uResolution;
 uniform float uTime;
+uniform float uElapsed;
+uniform float uRevealDelay;
+uniform float uRevealDuration;
 uniform float uPixelSize;
 uniform float uScale;
 uniform float uDensity;
 uniform float uPixelJitter;
 uniform int   uEnableRipples;
+uniform int   uBounce;
 uniform float uRippleSpeed;
 uniform float uRippleThickness;
 uniform float uRippleIntensity;
@@ -231,6 +235,13 @@ float maskDiamond(vec2 p, float cov){
 }
 
 void main(){
+  if (uElapsed < uRevealDelay) {
+    fragColor = vec4(0.0);
+    return;
+  }
+  float reveal = uRevealDuration > 0.0
+    ? clamp((uElapsed - uRevealDelay) / uRevealDuration, 0.0, 1.0)
+    : 1.0;
   float pixelSize = uPixelSize;
   vec2 fragCoord = gl_FragCoord.xy - uResolution * .5;
   float aspectRatio = uResolution.x / uResolution.y;
@@ -260,16 +271,46 @@ void main(){
       float cellPixelSize = 8.0 * pixelSize;
       vec2 cuv = (((pos - uResolution * .5 - cellPixelSize * .5) / (uResolution))) * vec2(aspectRatio, 1.0);
       float t = max(uTime - uClickTimes[i], 0.0);
-      float r = distance(uv, cuv);
       float waveR = speed * t;
-      float ring  = exp(-pow((r - waveR) / thickness, 2.0));
-      float atten = exp(-dampT * t) * exp(-dampR * r);
-      feed = max(feed, ring * atten * uRippleIntensity);
+      if (uBounce == 1) {
+        // Shed pixels quickly, with a sparse tail left to reflect off the walls.
+        float remaining = 1.0 / (1.0 + 10.0 * t);
+        float pixelSeed = hash11(dot(pixelId, vec2(127.1, 311.7)) + uClickTimes[i]);
+        if (pixelSeed > remaining) continue;
+        vec2 bounds = vec2(aspectRatio, 1.0);
+        vec2 origin = (pos - uResolution * .5) / uResolution.y;
+        vec2 cellCenter = uv + vec2(cellPixelSize * .5 / uResolution.y);
+        float diagonal = length(bounds);
+        // Drag slows the wave continuously, including along reflected paths.
+        waveR = diagonal * log(1.0 + waveR / diagonal);
+        if (waveR > 3.0 * diagonal) continue;
+        float atten = exp(-waveR / diagonal);
+        // Mirrored sources reflect the expanding ring at each edge, including corners.
+        for (int x = -1; x <= 1; ++x) {
+          for (int y = -1; y <= 1; ++y) {
+            vec2 image = vec2(
+              x == 0 ? origin.x : float(x) * bounds.x - origin.x,
+              y == 0 ? origin.y : float(y) * bounds.y - origin.y
+            );
+            float r = distance(cellCenter, image);
+            float ring = exp(-pow((r - waveR) / thickness, 2.0));
+            feed = max(feed, ring * atten * uRippleIntensity);
+          }
+        }
+      } else {
+        float r = distance(uv, cuv);
+        float ring = exp(-pow((r - waveR) / thickness, 2.0));
+        float atten = exp(-dampT * t) * exp(-dampR * r);
+        feed = max(feed, ring * atten * uRippleIntensity);
+      }
     }
   }
 
   float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
   float bw = step(0.5, feed + bayer);
+  // Give each pixel a stable arrival time throughout the reveal.
+  float arrival = hash11(dot(pixelId, vec2(269.5, 183.3)));
+  bw *= step(arrival, reveal);
 
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
   float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;
@@ -325,12 +366,15 @@ const PixelBlast = ({
   liquidRadius = 1.2,
   pixelSizeJitter = 1.7,
   enableRipples = true,
+  bounce = false,
   rippleIntensityScale = 1.5,
   rippleThickness = 0.12,
   rippleSpeed = 0.4,
   liquidWobbleSpeed = 5,
   autoPauseOffscreen = true,
   speed = 1,
+  revealDelay = 0,
+  revealDuration = 0,
   transparent = true,
   edgeFade = 0,
   noiseAmount = 0
@@ -348,12 +392,15 @@ const PixelBlast = ({
   liquidRadius?: number;
   pixelSizeJitter?: number;
   enableRipples?: boolean;
+  bounce?: boolean;
   rippleIntensityScale?: number;
   rippleThickness?: number;
   rippleSpeed?: number;
   liquidWobbleSpeed?: number;
   autoPauseOffscreen?: boolean;
   speed?: number;
+  revealDelay?: number;
+  revealDuration?: number;
   transparent?: boolean;
   edgeFade?: number;
   noiseAmount?: number;
@@ -426,6 +473,9 @@ const PixelBlast = ({
       const uniforms = {
         uResolution: { value: new THREE.Vector2(0, 0) },
         uTime: { value: 0 },
+        uElapsed: { value: 0 },
+        uRevealDelay: { value: Math.max(0, revealDelay) },
+        uRevealDuration: { value: Math.max(0, revealDuration) },
          uColor: { value: parseColor(resolvedColor) },
         uClickPos: {
           value: Array.from({ length: MAX_CLICKS }, () => new THREE.Vector2(-1, -1))
@@ -437,6 +487,7 @@ const PixelBlast = ({
         uDensity: { value: patternDensity },
         uPixelJitter: { value: pixelSizeJitter },
         uEnableRipples: { value: enableRipples ? 1 : 0 },
+        uBounce: { value: bounce ? 1 : 0 },
         uRippleSpeed: { value: rippleSpeed },
         uRippleThickness: { value: rippleThickness },
         uRippleIntensity: { value: rippleIntensityScale },
@@ -554,7 +605,8 @@ const PixelBlast = ({
           raf = requestAnimationFrame(animate);
           return;
         }
-        uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
+        uniforms.uElapsed.value = clock.getElapsedTime();
+        uniforms.uTime.value = timeOffset + uniforms.uElapsed.value * speedRef.current;
          if (liquidEffect) liquidEffect.uniforms.get('uTime')!.value = uniforms.uTime.value;
         if (composer) {
           if (touch) touch.update();
@@ -590,10 +642,13 @@ const PixelBlast = ({
       t.uniforms.uDensity.value = patternDensity;
       t.uniforms.uPixelJitter.value = pixelSizeJitter;
       t.uniforms.uEnableRipples.value = enableRipples ? 1 : 0;
+      t.uniforms.uBounce.value = bounce ? 1 : 0;
       t.uniforms.uRippleIntensity.value = rippleIntensityScale;
       t.uniforms.uRippleThickness.value = rippleThickness;
       t.uniforms.uRippleSpeed.value = rippleSpeed;
       t.uniforms.uEdgeFade.value = edgeFade;
+      t.uniforms.uRevealDelay.value = Math.max(0, revealDelay);
+      t.uniforms.uRevealDuration.value = Math.max(0, revealDuration);
       if (transparent) t.renderer.setClearAlpha(0);
       else t.renderer.setClearColor(0x000000, 1);
       if (t.liquidEffect) {
@@ -627,6 +682,7 @@ const PixelBlast = ({
     patternScale,
     patternDensity,
     enableRipples,
+    bounce,
     rippleIntensityScale,
     rippleThickness,
     rippleSpeed,
@@ -639,6 +695,8 @@ const PixelBlast = ({
     autoPauseOffscreen,
     variant,
     color,
+    revealDelay,
+    revealDuration,
     speed
   ]);
 
