@@ -408,6 +408,7 @@ const PixelBlast = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const visibilityRef = useRef({ visible: true });
   const speedRef = useRef(speed);
+  const autoPauseRef = useRef(autoPauseOffscreen);
 
   const threeRef = useRef<{
     renderer: THREE.WebGLRenderer;
@@ -433,6 +434,7 @@ const PixelBlast = ({
       ? getComputedStyle(container).getPropertyValue('--primary').trim()
       : color;
     speedRef.current = speed;
+    autoPauseRef.current = autoPauseOffscreen;
     const needsReinitKeys = ['antialias', 'liquid', 'noiseAmount'] as const;
     const cfg = { antialias, liquid, noiseAmount };
     let mustReinit = false;
@@ -601,10 +603,9 @@ const PixelBlast = ({
       });
       let raf = 0;
       const animate = () => {
-        if (autoPauseOffscreen && !visibilityRef.current.visible) {
-          raf = requestAnimationFrame(animate);
-          return;
-        }
+        raf = requestAnimationFrame(animate);
+        if (threeRef.current) threeRef.current.raf = raf;
+        if (autoPauseRef.current && !visibilityRef.current.visible) return;
         uniforms.uElapsed.value = clock.getElapsedTime();
         uniforms.uTime.value = timeOffset + uniforms.uElapsed.value * speedRef.current;
          if (liquidEffect) liquidEffect.uniforms.get('uTime')!.value = uniforms.uTime.value;
@@ -614,7 +615,6 @@ const PixelBlast = ({
           if (noiseTime) noiseTime.value = uniforms.uTime.value;
           composer.render();
         } else renderer.render(scene, camera);
-        raf = requestAnimationFrame(animate);
       };
       raf = requestAnimationFrame(animate);
       threeRef.current = {
@@ -660,20 +660,6 @@ const PixelBlast = ({
       if (t.touch) t.touch.radiusScale = liquidRadius;
     }
     prevConfigRef.current = cfg;
-    return () => {
-      if (threeRef.current && mustReinit) return;
-      if (!threeRef.current) return;
-      const t = threeRef.current;
-      t.resizeObserver?.disconnect();
-      cancelAnimationFrame(t.raf);
-      t.quad?.geometry.dispose();
-      t.material.dispose();
-      t.composer?.dispose();
-      t.renderer.dispose();
-      t.renderer.forceContextLoss();
-      if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
-      threeRef.current = null;
-    };
   }, [
     antialias,
     liquid,
@@ -699,6 +685,22 @@ const PixelBlast = ({
     revealDuration,
     speed
   ]);
+
+  useEffect(() => {
+    return () => {
+      if (!threeRef.current) return;
+      const t = threeRef.current;
+      t.resizeObserver?.disconnect();
+      cancelAnimationFrame(t.raf);
+      t.quad?.geometry.dispose();
+      t.material.dispose();
+      t.composer?.dispose();
+      t.renderer.dispose();
+      t.renderer.forceContextLoss();
+      t.renderer.domElement.remove();
+      threeRef.current = null;
+    };
+  }, []);
 
   return (
     <div
