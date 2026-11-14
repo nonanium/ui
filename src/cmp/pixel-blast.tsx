@@ -147,6 +147,7 @@ uniform float uScale;
 uniform float uDensity;
 uniform float uPixelJitter;
 uniform int   uEnableRipples;
+uniform int   uClickCount;
 uniform int   uBounce;
 uniform float uRippleSpeed;
 uniform float uRippleThickness;
@@ -247,6 +248,12 @@ void main(){
   float aspectRatio = uResolution.x / uResolution.y;
 
   vec2 pixelId = floor(fragCoord / pixelSize);
+  // Unrevealed pixels cannot contribute to the frame.
+  float arrival = hash11(dot(pixelId, vec2(269.5, 183.3)));
+  if (arrival > reveal) {
+    fragColor = vec4(0.0);
+    return;
+  }
   vec2 pixelUV = fract(fragCoord / pixelSize);
 
   float cellPixelSize = 8.0 * pixelSize;
@@ -265,7 +272,7 @@ void main(){
   const float dampR     = 10.0;
 
   if (uEnableRipples == 1) {
-    for (int i = 0; i < MAX_CLICKS; ++i){
+    for (int i = 0; i < uClickCount; ++i){
       vec2 pos = uClickPos[i];
       if (pos.x < 0.0) continue;
       float cellPixelSize = 8.0 * pixelSize;
@@ -308,9 +315,6 @@ void main(){
 
   float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
   float bw = step(0.5, feed + bayer);
-  // Give each pixel a stable arrival time throughout the reveal.
-  float arrival = hash11(dot(pixelId, vec2(269.5, 183.3)));
-  bw *= step(arrival, reveal);
 
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
   float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;
@@ -483,6 +487,7 @@ const PixelBlast = ({
           value: Array.from({ length: MAX_CLICKS }, () => new THREE.Vector2(-1, -1))
         },
         uClickTimes: { value: new Float32Array(MAX_CLICKS) },
+        uClickCount: { value: 0 },
         uShapeType: { value: SHAPE_MAP[variant] ?? 0 },
         uPixelSize: { value: pixelSize * renderer.getPixelRatio() },
         uScale: { value: patternScale },
@@ -588,6 +593,7 @@ const PixelBlast = ({
         const ix = threeRef.current?.clickIx ?? 0;
         uniforms.uClickPos.value[ix].set(fx, fy);
         uniforms.uClickTimes.value[ix] = uniforms.uTime.value;
+        uniforms.uClickCount.value = Math.min(uniforms.uClickCount.value + 1, MAX_CLICKS);
         if (threeRef.current) threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
       };
       const onPointerMove = (e: PointerEvent) => {
