@@ -13,6 +13,7 @@ const TENSAMIN_LOGO = new URL("./assets/tensamin-logo.svg", import.meta.url)
 const NONANIUM_LOGO = new URL("./assets/nonanium-logo.svg", import.meta.url)
   .href;
 const SECRET_LOGO = new URL("./assets/secret-logo.svg", import.meta.url).href;
+const BACKLOT_LOGO = new URL("./assets/backlot-logo.svg", import.meta.url).href;
 const OG_TENSAMIN_LOGO = new URL(
   "./assets/tensamin-og-logo.png",
   import.meta.url,
@@ -388,11 +389,176 @@ const SECRET: Theme = {
   ]),
 };
 
+const BACKLOT: Theme = {
+  id: "backlot",
+  title: "Backlot",
+  logo: BACKLOT_LOGO,
+  design: DEFAULT_THEME_DESIGN,
+  customCss: `@keyframes backlot-projector-sweep {
+  0% { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
+  15%, 75% { opacity: 1; }
+  100% { transform: translateX(360%) skewX(-18deg); opacity: 0; }
+}`,
+  tokens: {
+    light: {
+      "--background": "#F7F5F0",
+      "--foreground": "#252A2D",
+      "--card": "#FFFDFC",
+      "--card-foreground": "var(--foreground)",
+      "--popover": "var(--card)",
+      "--popover-foreground": "var(--foreground)",
+      "--primary": "#536B77",
+      "--primary-foreground": "#FFFFFF",
+      "--primary-foreground-alt": "#435D6A",
+      "--secondary": "#EAE7E0",
+      "--secondary-foreground": "var(--foreground)",
+      "--muted": "#EDECE6",
+      "--muted-foreground": "#5F686B",
+      "--accent": "#E3E9EA",
+      "--accent-foreground": "var(--foreground)",
+      "--destructive": "#B93632",
+      "--border": "#DFE1DE",
+      "--input": "#7D898B",
+      "--ring": "var(--primary)",
+      "--chart-1": "var(--primary)",
+      "--chart-2": "#A47A47",
+      "--chart-3": "#50766B",
+      "--chart-4": "#756B82",
+      "--chart-5": "#80715E",
+      "--sidebar": "#EDECE6",
+      "--sidebar-foreground": "var(--foreground)",
+      "--sidebar-primary": "var(--primary)",
+      "--sidebar-primary-foreground": "var(--primary-foreground)",
+      "--sidebar-accent": "var(--accent)",
+      "--sidebar-accent-foreground": "var(--foreground)",
+      "--sidebar-border": "var(--border)",
+      "--sidebar-ring": "var(--ring)",
+      "--markdown-code-background": "var(--muted)",
+    },
+    dark: {
+      "--background": "#141819",
+      "--foreground": "#E8E6E1",
+      "--card": "#20272A",
+      "--card-foreground": "var(--foreground)",
+      "--popover": "#293134",
+      "--popover-foreground": "var(--foreground)",
+      "--primary": "#9AB2BC",
+      "--primary-foreground": "#252A2D",
+      "--primary-foreground-alt": "#B0C5CC",
+      "--secondary": "#303638",
+      "--secondary-foreground": "var(--foreground)",
+      "--muted": "#262D2F",
+      "--muted-foreground": "#A6B0B1",
+      "--accent": "#344349",
+      "--accent-foreground": "var(--foreground)",
+      "--destructive": "#F08078",
+      "--border": "#354145",
+      "--input": "#73858A",
+      "--ring": "var(--primary)",
+      "--chart-1": "var(--primary)",
+      "--chart-2": "#C49A65",
+      "--chart-3": "#91B4A6",
+      "--chart-4": "#B0A4BD",
+      "--chart-5": "#BBAE96",
+      "--sidebar": "#191F21",
+      "--sidebar-foreground": "var(--foreground)",
+      "--sidebar-primary": "var(--primary)",
+      "--sidebar-primary-foreground": "var(--primary-foreground)",
+      "--sidebar-accent": "var(--accent)",
+      "--sidebar-accent-foreground": "var(--foreground)",
+      "--sidebar-border": "var(--border)",
+      "--sidebar-ring": "var(--ring)",
+      "--markdown-code-background": "#191F21",
+    },
+  },
+  rules: [
+    ...presetRules("backlot", ["ghost-hover-muted", "corners-medium"]),
+    {
+      id: "backlot-projector-button",
+      label: "Projector button frame",
+      group: "Buttons",
+      mode: "both",
+      selector: '[data-ui-button][data-variant="default"]',
+      declarations: "position: relative; overflow: hidden;",
+    },
+    {
+      id: "backlot-button-bevel",
+      label: "Film equipment button edge",
+      group: "Buttons",
+      mode: "both",
+      selector: '[data-ui-button][data-variant="default"]',
+      declarations:
+        "--tw-inset-shadow: inset 0 1px rgb(185 220 255 / 50%), inset 0 -2px rgb(10 20 28 / 38%);",
+    },
+    {
+      id: "backlot-projector-light",
+      label: "Projector light",
+      group: "Buttons",
+      mode: "both",
+      selector: '[data-ui-button][data-variant="default"]::before',
+      declarations: `content: "";
+position: absolute;
+inset-block: 0;
+left: 0;
+width: 45%;
+pointer-events: none;
+background: linear-gradient(90deg, transparent, rgb(185 220 255 / 22%), transparent);
+opacity: 0;
+transform: translateX(-160%) skewX(-18deg);`,
+    },
+    {
+      id: "backlot-projector-interactive",
+      label: "Projector sweep on interaction",
+      group: "Buttons",
+      mode: "both",
+      selector:
+        '[data-ui-button][data-variant="default"]:not(:disabled):not([data-disabled]):is(:hover, :focus-visible)::before',
+      declarations: `animation: backlot-projector-sweep 650ms ease-out both;
+@media (prefers-reduced-motion: reduce) {
+  animation: none;
+  opacity: 0.45;
+  transform: translateX(65%) skewX(-18deg);
+}`,
+    },
+    // Keep button text contrast when the shared variants fade their fills.
+    {
+      id: "backlot-primary-interactive",
+      label: "Primary interactive contrast",
+      group: "Buttons",
+      mode: "both",
+      selector:
+        '[data-ui-button][data-variant="default"]:is(:hover, :focus-visible, [aria-expanded="true"])',
+      declarations:
+        "background-color: var(--primary-foreground-alt) !important;",
+    },
+    {
+      id: "backlot-destructive-text",
+      label: "Destructive text contrast",
+      group: "Buttons",
+      mode: "both",
+      selector:
+        ':is([data-ui-button], [data-slot="badge"])[data-variant="destructive"]',
+      declarations: "color: var(--primary-foreground) !important;",
+    },
+    {
+      id: "backlot-destructive-interactive",
+      label: "Destructive interactive contrast",
+      group: "Buttons",
+      mode: "both",
+      selector:
+        ':is([data-ui-button], [data-slot="badge"])[data-variant="destructive"]:is(:hover, :focus-visible)',
+      declarations:
+        "background-color: color-mix(in srgb, var(--destructive) 90%, transparent) !important;",
+    },
+  ],
+};
+
 export const BUILT_IN_THEMES: readonly Theme[] = Object.freeze([
   TENSAMIN,
   OG_TENSAMIN,
   NONANIUM,
   SECRET,
+  BACKLOT,
 ]);
 
 export { BUILT_IN_THEME_IDS };

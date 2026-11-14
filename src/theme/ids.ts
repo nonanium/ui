@@ -3,4 +3,5 @@ export const BUILT_IN_THEME_IDS = [
   "og-tensamin",
   "nonanium",
   "secret",
+  "backlot",
 ];
