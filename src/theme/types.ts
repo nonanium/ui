@@ -5,6 +5,8 @@ export type ResolvedThemePolarity = "dark" | "light";
 
 export type ThemeFontFamily =
   | "public-sans"
+  | "dm-sans"
+  | "lexend"
   | "inter"
   | "roboto"
   | "open-sans"

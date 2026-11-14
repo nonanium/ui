@@ -24,6 +24,8 @@ import { TokenEditor } from "./TokenEditor";
 const FONT_OPTIONS: { value: ThemeFontFamily; label: string }[] = [
   { value: "system", label: "System" },
   { value: "public-sans", label: "Public Sans" },
+  { value: "dm-sans", label: "DM Sans" },
+  { value: "lexend", label: "Lexend" },
   { value: "inter", label: "Inter" },
   { value: "roboto", label: "Roboto" },
   { value: "open-sans", label: "Open Sans" },
