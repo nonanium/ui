@@ -1,5 +1,4 @@
 // Adapted from SPEC-01 registry/hardware/lib/sound.ts by Shu Ding.
-// https://github.com/shuding/spec-01/tree/b8f91b6646d9280d9de8e0f5b2c6453cb4f237cb
 // MIT License
 //
 // Copyright (c) 2026 Shu Ding
