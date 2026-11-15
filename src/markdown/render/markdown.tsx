@@ -40,6 +40,10 @@ import { EmojiProvider, useEmojiRegistry } from "../emoji/context";
 import type { EmojiRegistry } from "../emoji/registry";
 import { parseCodeMeta, remarkCodeMeta } from "../engine/code-meta";
 import { remarkEmoji } from "../emoji/remark-emoji";
+import { remarkTimestamps } from "../timestamps/remark-timestamps";
+import { Timestamp } from "../timestamps/timestamp";
+import type { TimestampStyle } from "../timestamps/format";
+import { useNonaniumSettings, type NonaniumSettings } from "../../settings";
 
 export type MarkdownTheme = "light" | "dark";
 export type MarkdownVariant = "article" | "compact";
@@ -48,6 +52,7 @@ export type MarkdownProps = Omit<ComponentProps<"div">, "children"> & {
   content: string;
   components?: Partial<MarkdownComponents>;
   registry?: EmojiRegistry;
+  settings?: NonaniumSettings;
   renderImage?: MarkdownImageRenderer;
   theme?: MarkdownTheme;
   trailingContent?: ReactNode;
@@ -139,6 +144,7 @@ function Markdown({
   className,
   components,
   registry: registryOverride,
+  settings: settingsOverride,
   renderImage,
   theme,
   trailingContent,
@@ -146,6 +152,8 @@ function Markdown({
   ...props
 }: MarkdownProps) {
   const registry = useEmojiRegistry(registryOverride);
+  const { settings: contextualSettings } = useNonaniumSettings();
+  const settings = { ...contextualSettings, ...settingsOverride };
   const remarkPlugins: NonNullable<
     ComponentProps<typeof ReactMarkdown>["remarkPlugins"]
   > = [
@@ -153,6 +161,7 @@ function Markdown({
     remarkMath,
     remarkBreaks,
     remarkCodeMeta,
+    remarkTimestamps,
     [remarkEmoji, { registry }],
   ];
 
@@ -174,7 +183,26 @@ function Markdown({
             skipHtml
             remarkPlugins={remarkPlugins}
             rehypePlugins={rehypePlugins}
-            components={{ ...defaultComponents, ...components }}
+            components={{
+              ...defaultComponents,
+              time({ node, children, ...timeProps }) {
+                const unix = node?.properties.dataUnix;
+                return unix !== undefined ? (
+                  <Timestamp
+                    unix={Number(unix)}
+                    style={
+                      String(
+                        node?.properties.dataStyle ?? "f",
+                      ) as TimestampStyle
+                    }
+                    settings={settings}
+                  />
+                ) : (
+                  <time {...timeProps}>{children}</time>
+                );
+              },
+              ...components,
+            }}
           >
             {content}
           </ReactMarkdown>

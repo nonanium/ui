@@ -1,9 +1,12 @@
 import { completionStatus, startCompletion } from "@codemirror/autocomplete";
 import { Compartment, EditorState, Transaction } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import { cn } from "../../lib/utils";
+import { useNonaniumSettings, type NonaniumSettings } from "../../settings";
+import { createTimestampExtensions, TIMESTAMP_HINT_ID } from "./timestamps";
+import { timestampToken, type TimestampStyle } from "../timestamps/format";
 import { useEmojiRegistry } from "../emoji/context";
 import type { EmojiRegistry } from "../emoji/registry";
 import { createEmojiExtensions } from "./emoji";
@@ -21,6 +24,7 @@ export type InputController = {
   insertText: (text: string) => void;
   insertTable: () => void;
   insertMath: (display?: boolean) => void;
+  insertTimestamp: (unix?: number, style?: TimestampStyle) => void;
   refreshMedia: () => void;
 };
 
@@ -40,6 +44,7 @@ export type InputProps = {
   autoFocus?: boolean;
   onControllerChange?: (controller: InputController | null) => void;
   registry?: EmojiRegistry;
+  settings?: NonaniumSettings;
   resolveMedia?: ResolveMedia;
   onEditDrawing?: EditDrawing;
   onCropImage?: CropImage;
@@ -59,6 +64,36 @@ function toCssPadding(
 
 export default function Input(props: InputProps) {
   const registry = useEmojiRegistry(props.registry);
+  const { settings: contextualSettings, updateSettings } =
+    useNonaniumSettings();
+  const settings = useMemo(
+    () => ({
+      ...contextualSettings,
+      ...props.settings,
+      timestamps: {
+        ...contextualSettings.timestamps,
+        ...props.settings?.timestamps,
+        defaultModes: {
+          ...contextualSettings.timestamps?.defaultModes,
+          ...props.settings?.timestamps?.defaultModes,
+        },
+      },
+    }),
+    [contextualSettings, props.settings],
+  );
+  const acknowledgeRef = useRef(() => {});
+  acknowledgeRef.current = () =>
+    updateSettings({
+      acknowledgedHints: [
+        ...new Set([
+          ...(contextualSettings.acknowledgedHints ?? []),
+          TIMESTAMP_HINT_ID,
+        ]),
+      ],
+    });
+  const timestampCompartmentRef = useRef<Compartment | null>(null);
+  timestampCompartmentRef.current ??= new Compartment();
+  const timestampCompartment = timestampCompartmentRef.current;
   const elementRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | undefined>(undefined);
   const setValueRef = useRef(props.setValue);
@@ -86,20 +121,25 @@ export default function Input(props: InputProps) {
     if (!elementRef.current) return;
     const state = EditorState.create({
       doc: props.value,
-      extensions: createEditorExtensions(
-        (value) => setValueRef.current(value),
-        () => props.placeholder,
-        () => invertEnterBehaviorRef.current,
-        () => onSubmitRef.current,
-        emojiCompartment,
-        props.emojiFrequencies,
-        (shortcode) => onEmojiSelectRef.current?.(shortcode),
-        registry,
-        () => registryRef.current,
-        props.resolveMedia,
-        props.onEditDrawing,
-        props.onCropImage,
-      ),
+      extensions: [
+        createEditorExtensions(
+          (value) => setValueRef.current(value),
+          () => props.placeholder,
+          () => invertEnterBehaviorRef.current,
+          () => onSubmitRef.current,
+          emojiCompartment,
+          props.emojiFrequencies,
+          (shortcode) => onEmojiSelectRef.current?.(shortcode),
+          registry,
+          () => registryRef.current,
+          props.resolveMedia,
+          props.onEditDrawing,
+          props.onCropImage,
+        ),
+        timestampCompartment.of(
+          createTimestampExtensions(settings, () => acknowledgeRef.current()),
+        ),
+      ],
     });
 
     viewRef.current = new EditorView({ state, parent: elementRef.current });
@@ -135,6 +175,15 @@ export default function Input(props: InputProps) {
         });
         editor.focus();
       },
+      insertTimestamp: (unix = Math.floor(Date.now() / 1000), style = "f") => {
+        const editor = viewRef.current;
+        if (!editor) return;
+        editor.dispatch({
+          ...editor.state.replaceSelection(timestampToken(unix, style)),
+          userEvent: "input",
+        });
+        editor.focus();
+      },
       refreshMedia: () => {
         viewRef.current?.dispatch({ effects: refreshMediaEffect.of() });
       },
@@ -164,6 +213,14 @@ export default function Input(props: InputProps) {
       filter: false,
     });
   }, [props.value]);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: timestampCompartment.reconfigure(
+        createTimestampExtensions(settings, () => acknowledgeRef.current()),
+      ),
+    });
+  }, [settings, timestampCompartment]);
 
   useEffect(() => {
     registryRef.current = registry;

@@ -6,6 +6,7 @@ import { Markdown, type MarkdownProps } from "./markdown";
 export type TextProps = {
   fontSize?: CSSProperties["fontSize"];
   registry?: EmojiRegistry;
+  settings?: MarkdownProps["settings"];
   renderImage?: MarkdownProps["renderImage"];
   showEditedIndicator?: boolean;
   value: string;
@@ -14,6 +15,7 @@ export type TextProps = {
 export default function Text({
   fontSize,
   registry,
+  settings,
   renderImage,
   showEditedIndicator = false,
   value,
@@ -27,6 +29,7 @@ export default function Text({
       }
       content={value}
       registry={registry}
+      settings={settings}
       renderImage={renderImage}
       trailingContent={
         showEditedIndicator ? (

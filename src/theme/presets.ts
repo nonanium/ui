@@ -48,8 +48,7 @@ const TENSAMIN: Theme = {
       "--ring": "#12a89e",
       "--sidebar": "color-mix(in oklch, var(--background) 97%, black)",
       "--sidebar-primary": "var(--primary)",
-      "--markdown-code-background":
-        "color-mix(in oklch, var(--muted) 72%, var(--background))",
+      "--markdown-code-background": "var(--card)",
     },
     dark: {
       "--background": "#131313",
@@ -83,8 +82,7 @@ const TENSAMIN: Theme = {
       "--sidebar-accent-foreground": "#ededed",
       "--sidebar-border": "color-mix(in srgb, var(--sidebar) 84%, white)",
       "--sidebar-ring": "var(--ring)",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--background) 94%, black)",
+      "--markdown-code-background": "var(--card)",
     },
   },
   rules: presetRules("tensamin", ["ghost-hover-muted", "corners-medium"]),
@@ -130,8 +128,7 @@ const OG_TENSAMIN: Theme = {
       "--chart-3": "#aca1cf",
       "--chart-4": "#e29eca",
       "--chart-5": "#e5c890",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--muted) 78%, var(--background))",
+      "--markdown-code-background": "var(--card)",
     },
     dark: {
       "--background": "#0f1014",
@@ -166,8 +163,7 @@ const OG_TENSAMIN: Theme = {
       "--chart-3": "#aca1cf",
       "--chart-4": "#e29eca",
       "--chart-5": "#e5c890",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--muted) 72%, black 28%)",
+      "--markdown-code-background": "var(--card)",
     },
   },
   rules: presetRules("og-tensamin", ["popup-colors", "menu-item-highlight"]),
@@ -183,7 +179,7 @@ const NONANIUM: Theme = {
     light: {
       "--background": "#fafafa",
       "--foreground": "#171717",
-      "--card": "#ffffff",
+      "--card": "var(--popover)",
       "--card-foreground": "#171717",
       "--popover": "#ffffff",
       "--popover-foreground": "#171717",
@@ -198,7 +194,7 @@ const NONANIUM: Theme = {
       "--accent-foreground": "#171717",
       "--destructive": "#b91c1c",
       "--border": "#dddddd",
-      "--input": "#cccccc",
+      "--input": "#dddddd",
       "--ring": "#9d53bc",
       "--chart-1": "#8c47ad",
       "--chart-2": "#2563eb",
@@ -213,13 +209,12 @@ const NONANIUM: Theme = {
       "--sidebar-accent-foreground": "#171717",
       "--sidebar-border": "#dddddd",
       "--sidebar-ring": "#9d53bc",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--input) 55%, var(--background))",
+      "--markdown-code-background": "var(--card)",
     },
     dark: {
       "--background": "#000000",
       "--foreground": "#ededed",
-      "--card": "#101010",
+      "--card": "var(--popover)",
       "--card-foreground": "#ededed",
       "--popover": "#181818",
       "--popover-foreground": "#ededed",
@@ -234,7 +229,7 @@ const NONANIUM: Theme = {
       "--accent-foreground": "#ededed",
       "--destructive": "#cc4848",
       "--border": "#262626",
-      "--input": "#404040",
+      "--input": "#707070",
       "--ring": "#cf8fe6",
       "--chart-1": "#cf8fe6",
       "--chart-2": "#4e96cc",
@@ -249,8 +244,7 @@ const NONANIUM: Theme = {
       "--sidebar-accent-foreground": "#ededed",
       "--sidebar-border": "#262626",
       "--sidebar-ring": "#cf8fe6",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--input) 55%, var(--background))",
+      "--markdown-code-background": "var(--card)",
     },
   },
   rules: presetRules("nonanium", [
@@ -314,8 +308,7 @@ const SECRET: Theme = {
       "--sidebar-accent": "#d7a8c9",
       "--sidebar-accent-foreground": "#2f1b13",
       "--sidebar-border": "var(--secret-border)",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--secret-gold) 9%, var(--background))",
+      "--markdown-code-background": "var(--card)",
     },
     dark: {
       "--secret-border": "color-mix(in srgb, #ffe8b4 8%, #24120c 35%)",
@@ -353,8 +346,7 @@ const SECRET: Theme = {
       "--sidebar-accent": "#aa1c41",
       "--sidebar-accent-foreground": "#fffaf2",
       "--sidebar-border": "var(--secret-border)",
-      "--markdown-code-background":
-        "color-mix(in srgb, var(--muted) 72%, black 28%)",
+      "--markdown-code-background": "var(--card)",
     },
   },
   rules: presetRules("secret", [
@@ -433,7 +425,7 @@ const BACKLOT: Theme = {
       "--sidebar-accent-foreground": "var(--foreground)",
       "--sidebar-border": "var(--border)",
       "--sidebar-ring": "var(--ring)",
-      "--markdown-code-background": "var(--muted)",
+      "--markdown-code-background": "var(--card)",
     },
     dark: {
       "--background": "#141819",
@@ -468,7 +460,7 @@ const BACKLOT: Theme = {
       "--sidebar-accent-foreground": "var(--foreground)",
       "--sidebar-border": "var(--border)",
       "--sidebar-ring": "var(--ring)",
-      "--markdown-code-background": "#191F21",
+      "--markdown-code-background": "var(--card)",
     },
   },
   rules: [

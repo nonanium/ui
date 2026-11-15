@@ -80,6 +80,7 @@ export type Theme = ThemeStyle & {
 };
 
 export type ThemeProviderProps = {
+  storage?: import("../settings").NonaniumStorage;
   children: React.ReactNode;
   /** Initial viewing preference for polarity. Defaults to "system". */
   defaultTheme?: ThemePolarity;

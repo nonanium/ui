@@ -1,11 +1,19 @@
 import { syntaxTree } from "@codemirror/language";
 import type { EditorState } from "@codemirror/state";
 import type { Root } from "react-dom/client";
+import type { ReactNode } from "react";
 
 const widgetRoots = new WeakMap<HTMLElement, Root>();
 
 export function registerWidgetRoot(dom: HTMLElement, root: Root) {
   widgetRoots.set(dom, root);
+}
+
+export function renderWidgetRoot(dom: HTMLElement, content: ReactNode) {
+  const root = widgetRoots.get(dom);
+  if (!root) return false;
+  root.render(content);
+  return true;
 }
 
 export function destroyWidgetRoot(dom: HTMLElement) {

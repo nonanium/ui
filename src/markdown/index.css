@@ -74,11 +74,7 @@
 @layer components {
   [data-slot="markdown"],
   .tm-md-root {
-    --markdown-code-background-default: color-mix(
-      in oklch,
-      var(--muted) 72%,
-      var(--background)
-    );
+    --markdown-code-background-default: var(--card);
     --markdown-code-foreground: var(--foreground);
     --markdown-code-token-constant: var(--primary-foreground-alt);
     --markdown-code-token-string: color-mix(
@@ -111,11 +107,6 @@
   .dark [data-slot="markdown"]:not([data-code-theme="light"]),
   [data-slot="markdown"][data-code-theme="dark"],
   .dark .tm-md-root {
-    --markdown-code-background-default: color-mix(
-      in oklch,
-      var(--muted) 76%,
-      black 24%
-    );
     --markdown-code-token-constant: var(--chart-1);
     --markdown-code-token-keyword: color-mix(
       in oklch,

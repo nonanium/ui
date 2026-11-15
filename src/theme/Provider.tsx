@@ -66,10 +66,11 @@ export function ThemeProvider({
   onCustomThemesChange,
   onSelectedThemeIdChange,
   storageKey = "theme",
+  storage,
   disableTransitionOnChange = true,
 }: ThemeProviderProps) {
   const [themePolarity, setThemePolarityState] = useState(() =>
-    readStoredValue(storageKey, isTheme, defaultTheme),
+    readStoredValue(storageKey, isTheme, defaultTheme, storage),
   );
   const [systemPolarity, setSystemPolarity] = useState<ResolvedThemePolarity>(
     () => getSystemTheme(),
@@ -91,10 +92,10 @@ export function ThemeProvider({
 
   const setThemePolarity = useCallback(
     (next: ThemePolarity) => {
-      saveStoredValue(storageKey, next);
+      saveStoredValue(storageKey, next, storage);
       setThemePolarityState(next);
     },
-    [storageKey],
+    [storageKey, storage],
   );
 
   const updateCustomThemes = useCallback(
@@ -236,6 +237,7 @@ export function ThemeProvider({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handleStorageChange = (event: StorageEvent) => {
+      if (storage) return;
       if (event.storageArea !== localStorage) return;
       if (event.key !== storageKey) return;
       setThemePolarityState(
@@ -244,7 +246,7 @@ export function ThemeProvider({
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, [defaultTheme, storageKey]);
+  }, [defaultTheme, storageKey, storage]);
 
   const value = useMemo<ThemeProviderState>(
     () => ({

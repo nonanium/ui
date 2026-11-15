@@ -98,14 +98,19 @@ export function readStoredValue<T extends string>(
   key: string | null | undefined,
   validate: (value: string | null) => value is T,
   fallback: T,
+  storage?: import("../settings").NonaniumStorage,
 ) {
   if (!key || typeof window === "undefined") return fallback;
 
-  const value = localStorage.getItem(key);
+  const value = (storage ?? localStorage).getItem(key);
   return validate(value) ? value : fallback;
 }
 
-export function saveStoredValue(key: string | null | undefined, value: string) {
+export function saveStoredValue(
+  key: string | null | undefined,
+  value: string,
+  storage?: import("../settings").NonaniumStorage,
+) {
   if (!key || typeof window === "undefined") return;
-  localStorage.setItem(key, value);
+  (storage ?? localStorage).setItem(key, value);
 }

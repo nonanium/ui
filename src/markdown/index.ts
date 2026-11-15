@@ -1,4 +1,14 @@
 export { Markdown } from "./render/markdown";
+export { Timestamp, TimestampEditor } from "./timestamps/timestamp";
+export {
+  formatTimestamp,
+  timestampToken,
+  timestampStyles,
+  timestampStyleLabels,
+} from "./timestamps/format";
+export type { TimestampStyle } from "./timestamps/format";
+export { detectTimestamps } from "./timestamps/detect";
+export type { DetectedTimestamp } from "./timestamps/detect";
 export type { MarkdownImageRenderer } from "./render/components";
 export type {
   MarkdownComponents,
