@@ -165,6 +165,7 @@ function Markdown({
     [remarkEmoji, { registry }],
   ];
 
+  // Select rendered blocks without including the container's trailing paragraph separator.
   return (
     <EmojiProvider registry={registry}>
       <div
@@ -173,7 +174,7 @@ function Markdown({
         data-code-theme={theme}
         data-variant={variant}
         className={cn(
-          "group/markdown text-[0.9375rem]/[1.75] text-foreground [&>:first-child]:mt-0 [&>:last-child]:mb-0",
+          "group/markdown select-none text-[0.9375rem]/[1.75] text-foreground [&>*]:select-text [&>:first-child]:mt-0 [&>:last-child]:mb-0",
           variant === "compact" && "text-base/[1.65]",
           className,
         )}
