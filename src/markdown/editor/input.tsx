@@ -1,7 +1,16 @@
 import { completionStatus, startCompletion } from "@codemirror/autocomplete";
 import { Compartment, EditorState, Transaction } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "../../lib/utils";
 import { useNonaniumSettings, type NonaniumSettings } from "../../settings";
@@ -11,6 +20,7 @@ import { useEmojiRegistry } from "../emoji/context";
 import type { EmojiRegistry } from "../emoji/registry";
 import { createEmojiExtensions } from "./emoji";
 import { createEditorExtensions, externalValueSync } from "./extensions";
+import { linkDecorations, type RenderLink } from "./links";
 import {
   refreshMediaEffect,
   type CropImage,
@@ -46,6 +56,7 @@ export type InputProps = {
   registry?: EmojiRegistry;
   settings?: NonaniumSettings;
   resolveMedia?: ResolveMedia;
+  renderLink?: RenderLink;
   onEditDrawing?: EditDrawing;
   onCropImage?: CropImage;
 };
@@ -63,6 +74,19 @@ function toCssPadding(
 }
 
 export default function Input(props: InputProps) {
+  const [links, setLinks] = useState<
+    { element: HTMLElement; content: ReactNode; key: number }[]
+  >([]);
+  const nextLinkKey = useRef(0);
+  const mountLink = useCallback((element: HTMLElement, content: ReactNode) => {
+    const key = nextLinkKey.current++;
+    setLinks((current) => [...current, { element, content, key }]);
+  }, []);
+  const unmountLink = useCallback((element: HTMLElement) => {
+    setLinks((current) => current.filter((link) => link.element !== element));
+  }, []);
+  const renderLinkRef = useRef(props.renderLink);
+  renderLinkRef.current = props.renderLink;
   const registry = useEmojiRegistry(props.registry);
   const { settings: contextualSettings, updateSettings } =
     useNonaniumSettings();
@@ -122,6 +146,11 @@ export default function Input(props: InputProps) {
     const state = EditorState.create({
       doc: props.value,
       extensions: [
+        linkDecorations(
+          (url) => renderLinkRef.current?.(url),
+          mountLink,
+          unmountLink,
+        ),
         createEditorExtensions(
           (value) => setValueRef.current(value),
           () => props.placeholder,
@@ -240,21 +269,26 @@ export default function Input(props: InputProps) {
   }, [emojiCompartment, props.emojiFrequencies, registry]);
 
   return (
-    <div
-      ref={elementRef}
-      className={cn(
-        "tm-md-root min-h-8 w-full min-w-0 text-base outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        props.className,
+    <>
+      <div
+        ref={elementRef}
+        className={cn(
+          "tm-md-root min-h-8 w-full min-w-0 text-base outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          props.className,
+        )}
+        style={
+          {
+            fontSize: props.fontSize ?? "1rem",
+            "--tm-md-content-padding": toCssPadding(
+              props.paddingY,
+              props.paddingX,
+            ),
+          } as CSSProperties & { "--tm-md-content-padding"?: string }
+        }
+      />
+      {links.map(({ element, content, key }) =>
+        createPortal(content, element, String(key)),
       )}
-      style={
-        {
-          fontSize: props.fontSize ?? "1rem",
-          "--tm-md-content-padding": toCssPadding(
-            props.paddingY,
-            props.paddingX,
-          ),
-        } as CSSProperties & { "--tm-md-content-padding"?: string }
-      }
-    />
+    </>
   );
 }
