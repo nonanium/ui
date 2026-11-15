@@ -330,23 +330,6 @@ background-image: none;`,
     `background-image: linear-gradient(to top, rgb(255 255 255 / 12%), rgb(255 255 255 / 2%));`,
   ),
   rule(
-    "gold-primary-button",
-    "Gold primary button",
-    "Buttons",
-    "both",
-    `[data-ui-button][data-variant="default"]`,
-    `background-color: var(--primary);
-background-image:
-  linear-gradient(to top, rgb(255 255 255 / 12%), rgb(255 255 255 / 2%)),
-  linear-gradient(115deg, var(--secret-gold-dark) 0%, var(--secret-gold) 30%, var(--secret-gold-light) 47%, var(--secret-gold) 62%, var(--secret-gold-dark) 100%);
-border-color: var(--secret-border);
-color: var(--primary-foreground);
-text-shadow: 0 1px rgb(255 255 255 / 35%);
-box-shadow:
-  inset 0 1px rgb(255 255 255 / 45%),
-  0 0.45rem 1.2rem rgb(36 18 12 / 28%);`,
-  ),
-  rule(
     "outline-hover-light",
     "Outline hover (light)",
     "Buttons",
@@ -472,159 +455,6 @@ border-color: color-mix(in srgb, var(--input) 75%, var(--foreground) 25%);`,
 [data-slot="input"]:not(:disabled):focus:hover`,
     `border-color: var(--primary);`,
   ),
-  rule(
-    "secret-control-fill",
-    "Colored control fill",
-    "Inputs",
-    "both",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-)`,
-    `background-color: var(--secret-control);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-control-text-light",
-    "Colored control text (light)",
-    "Inputs",
-    "light",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-)`,
-    `color: #2f1b13;`,
-  ),
-  rule(
-    "secret-control-text-dark",
-    "Colored control text (dark)",
-    "Inputs",
-    "dark",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-)`,
-    `color: #ffe8b4;`,
-  ),
-  rule(
-    "secret-placeholder-light",
-    "Placeholder color (light)",
-    "Inputs",
-    "light",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"]
-)::placeholder`,
-    `color: #5f4558;
-opacity: 1;`,
-  ),
-  rule(
-    "secret-placeholder-dark",
-    "Placeholder color (dark)",
-    "Inputs",
-    "dark",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"]
-)::placeholder`,
-    `color: #d9b99c;
-opacity: 1;`,
-  ),
-  rule(
-    "secret-control-hover-light",
-    "Colored control hover (light)",
-    "Inputs",
-    "light",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-):hover`,
-    `background-color: color-mix(in srgb, var(--secret-control) 88%, #622a53 12%);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-control-hover-dark",
-    "Colored control hover (dark)",
-    "Inputs",
-    "dark",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-):hover`,
-    `background-color: color-mix(in srgb, var(--secret-control) 84%, #24120c 16%);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-control-focus-light",
-    "Colored control focus (light)",
-    "Inputs",
-    "light",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-):is(:focus-visible, :focus-within)`,
-    `background-color: color-mix(in srgb, var(--secret-control) 88%, #622a53 12%);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-control-focus-dark",
-    "Colored control focus (dark)",
-    "Inputs",
-    "dark",
-    `:where(
-  [data-slot="input"],
-  [data-slot="textarea"],
-  [data-slot="native-select"],
-  [data-slot="select-trigger"],
-  [data-slot="input-group"]
-):is(:focus-visible, :focus-within)`,
-    `background-color: color-mix(in srgb, var(--secret-control) 84%, #24120c 16%);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-trigger-open-light",
-    "Open select trigger (light)",
-    "Inputs",
-    "light",
-    `[data-slot="select-trigger"]:is(
-  [data-popup-open],
-  [data-open],
-  [aria-expanded="true"]
-)`,
-    `background-color: color-mix(in srgb, var(--secret-control) 88%, #622a53 12%);
-border-color: transparent;`,
-  ),
-  rule(
-    "secret-trigger-open-dark",
-    "Open select trigger (dark)",
-    "Inputs",
-    "dark",
-    `[data-slot="select-trigger"]:is(
-  [data-popup-open],
-  [data-open],
-  [aria-expanded="true"]
-)`,
-    `background-color: color-mix(in srgb, var(--secret-control) 84%, #24120c 16%);
-border-color: transparent;`,
-  ),
 
   // Menus
   rule(
@@ -647,54 +477,6 @@ color: var(--popover-foreground);`,
 [data-slot="command-item"][data-selected]`,
     `background-color: var(--accent);
 color: var(--accent-foreground);`,
-  ),
-  rule(
-    "select-popup-border",
-    "Select popup border",
-    "Menus",
-    "both",
-    `[data-slot="select-content"]`,
-    `background-color: var(--popover);
-border-color: var(--secret-border);
-color: var(--popover-foreground);`,
-  ),
-  rule(
-    "secret-item-highlight-light",
-    "Warm highlighted item (light)",
-    "Menus",
-    "light",
-    `:where(
-  [data-slot="select-item"],
-  [data-slot="context-menu-item"],
-  [data-slot="context-menu-sub-trigger"]
-):is(
-  :hover,
-  :focus,
-  [data-highlighted],
-  [data-selected],
-  [data-open]
-)`,
-    `background-color: color-mix(in srgb, var(--popover) 82%, #622a53 18%);
-color: #2f1b13;`,
-  ),
-  rule(
-    "secret-item-highlight-dark",
-    "Warm highlighted item (dark)",
-    "Menus",
-    "dark",
-    `:where(
-  [data-slot="select-item"],
-  [data-slot="context-menu-item"],
-  [data-slot="context-menu-sub-trigger"]
-):is(
-  :hover,
-  :focus,
-  [data-highlighted],
-  [data-selected],
-  [data-open]
-)`,
-    `background-color: color-mix(in srgb, var(--popover) 72%, #0a0a0a 28%);
-color: #ffe8b4;`,
   ),
 
   // Cards
@@ -723,21 +505,6 @@ background-color: color-mix(in srgb, var(--input) 55%, var(--background));`,
     "both",
     `[data-slot="card"]`,
     `background: var(--card);`,
-  ),
-  rule(
-    "card-shadow",
-    "Card & dialog shadow",
-    "Cards",
-    "both",
-    `:where(
-  [data-slot="card"],
-  [data-slot="dialog-content"],
-  [data-slot="alert-dialog-content"]
-)`,
-    `border-color: var(--secret-border);
-box-shadow:
-  inset 0 1px color-mix(in oklch, white 8%, transparent),
-  0 1rem 3rem rgb(97 37 82 / 12%);`,
   ),
 
   // Tabs
@@ -771,18 +538,6 @@ box-shadow:
   [data-slot="badge"][data-variant="outline"]
 ) svg`,
     `color: var(--primary);`,
-  ),
-  rule(
-    "icon-primary-light",
-    "Primary-colored icons (light)",
-    "Icons",
-    "light",
-    `:where(
-  [data-slot="card-title"],
-  [data-slot="item-media"][data-variant="icon"],
-  [data-slot="badge"][data-variant="outline"]
-) svg`,
-    `color: var(--secret-gold-dark);`,
   ),
 ]);
 
