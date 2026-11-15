@@ -119,34 +119,10 @@ function MarkdownH6({
 function MarkdownParagraph({
   node: _,
   className,
-  onMouseUp,
   ...props
 }: MarkdownElementProps<"p">) {
   return (
     <p
-      onMouseUp={(event) => {
-        onMouseUp?.(event);
-        if (event.defaultPrevented || event.detail < 2) return;
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount !== 1) return;
-        const range = selection.getRangeAt(0);
-        const paragraph = event.currentTarget;
-        if (
-          !paragraph.contains(range.startContainer) ||
-          paragraph.contains(range.endContainer)
-        )
-          return;
-        // Browser paragraph selection can include separators after the final text.
-        const walker = document.createTreeWalker(
-          paragraph,
-          NodeFilter.SHOW_TEXT,
-        );
-        let end = walker.nextNode();
-        if (!end) return;
-        for (let next = walker.nextNode(); next; next = walker.nextNode())
-          end = next;
-        range.setEnd(end, end.textContent?.length ?? 0);
-      }}
       className={cn(
         "my-4 group-data-[variant=compact]/markdown:my-[0.45rem]",
         className,
