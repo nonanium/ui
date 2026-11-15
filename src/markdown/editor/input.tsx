@@ -59,7 +59,7 @@ function toCssPadding(
   vertical: CSSProperties["padding"],
   horizontal: CSSProperties["padding"],
 ) {
-  return `${toCssLength(vertical) ?? "0.25rem"} ${toCssLength(horizontal) ?? "0.625rem"}`;
+  return `${toCssLength(vertical) ?? "0.25rem"} ${toCssLength(horizontal) ?? "0px"}`;
 }
 
 export default function Input(props: InputProps) {
