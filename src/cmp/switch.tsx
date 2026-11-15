@@ -1,14 +1,20 @@
+import { useInteractionSound, type SoundProps } from "../sounds";
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
 
 import { cn } from "../lib/utils";
 
 function Switch({
   className,
+  sound,
+  onClick,
   size = "default",
   ...props
-}: SwitchPrimitive.Root.Props & {
-  size?: "sm" | "default";
-}) {
+}: SwitchPrimitive.Root.Props &
+  SoundProps & {
+    size?: "sm" | "default";
+  }) {
+  const play = useInteractionSound("switch", sound);
+
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
@@ -17,6 +23,10 @@ function Switch({
         "peer group/switch relative inline-flex shrink-0 items-center rounded-full border-0! bg-none! transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-unchecked:bg-muted-foreground data-disabled:cursor-not-allowed data-disabled:opacity-50",
         className,
       )}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented && !props.disabled) play("toggle");
+      }}
       {...props}
     >
       <SwitchPrimitive.Thumb

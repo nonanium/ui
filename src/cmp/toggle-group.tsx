@@ -1,3 +1,4 @@
+import { useInteractionSound, type SoundProps } from "../sounds";
 import * as React from "react";
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group";
@@ -56,12 +57,16 @@ function ToggleGroup({
 
 function ToggleGroupItem({
   className,
+  sound,
+  onClick,
   children,
   variant = "default",
   size = "default",
   ...props
-}: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) {
+}: TogglePrimitive.Props & VariantProps<typeof toggleVariants> & SoundProps) {
   const context = React.useContext(ToggleGroupContext);
+
+  const play = useInteractionSound("toggle", sound);
 
   return (
     <TogglePrimitive
@@ -77,6 +82,10 @@ function ToggleGroupItem({
         }),
         className,
       )}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented && !props.disabled) play("toggle");
+      }}
       {...props}
     >
       {children}

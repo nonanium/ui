@@ -1,13 +1,15 @@
+import { useInteractionSound, type SoundProps } from "../sounds";
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/utils";
 
 function SpecialSwitch<Value extends string>({
   className,
+  sound,
   value,
   onValueChange,
   options,
-}: {
+}: SoundProps & {
   className?: string;
   value: Value;
   onValueChange: (value: Value) => void;
@@ -16,6 +18,7 @@ function SpecialSwitch<Value extends string>({
     { value: Value; label: ReactNode },
   ];
 }) {
+  const play = useInteractionSound("switch", sound);
   const selectedIndex = options.findIndex((option) => option.value === value);
 
   return (
@@ -42,7 +45,10 @@ function SpecialSwitch<Value extends string>({
           role="tab"
           aria-selected={value === option.value}
           className="relative z-10 w-full cursor-pointer rounded-4xl px-2.5 py-1.5 text-center text-sm font-medium transition-colors aria-selected:text-foreground not-aria-selected:text-foreground/50 not-aria-selected:hover:text-foreground"
-          onClick={() => onValueChange(option.value)}
+          onClick={() => {
+            onValueChange(option.value);
+            if (value !== option.value) play("toggle");
+          }}
         >
           {option.label}
         </button>

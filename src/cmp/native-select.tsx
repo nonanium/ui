@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useInteractionSound, type SoundProps } from "../sounds";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
@@ -15,14 +16,18 @@ const nativeSelectVariants = cva(
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
   size?: "sm" | "default";
-} & VariantProps<typeof nativeSelectVariants>;
+} & VariantProps<typeof nativeSelectVariants> &
+  SoundProps;
 
 function NativeSelect({
   className,
+  sound,
+  onChange,
   size = "default",
   variant = "outline",
   ...props
 }: NativeSelectProps) {
+  const play = useInteractionSound("select", sound);
   return (
     <div
       className={cn(
@@ -38,6 +43,10 @@ function NativeSelect({
         data-variant={variant}
         className={nativeSelectVariants({ variant })}
         {...props}
+        onChange={(event) => {
+          onChange?.(event);
+          if (!event.defaultPrevented && !props.disabled) play("snap");
+        }}
       />
       <ChevronDownIcon
         className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground select-none"

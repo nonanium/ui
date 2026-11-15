@@ -1,3 +1,4 @@
+import { useDragSound, useInteractionSound, type SoundProps } from "../sounds";
 import type { CSSProperties, PointerEvent } from "react";
 
 import { cn } from "../lib/utils";
@@ -11,13 +12,17 @@ export function HuePicker({
   onValueChange,
   color = `hsl(${value} 80% 50%)`,
   className,
+  sound,
   style,
   ...props
-}: Omit<React.ComponentProps<"div">, "onChange"> & {
-  value: number;
-  onValueChange(value: number): void;
-  color?: string;
-}) {
+}: Omit<React.ComponentProps<"div">, "onChange"> &
+  SoundProps & {
+    value: number;
+    onValueChange(value: number): void;
+    color?: string;
+  }) {
+  const onSoundPointerDown = useDragSound("slider", sound);
+  const play = useInteractionSound("slider", sound);
   const hue = normalizeHue(value);
   const angle = (hue * Math.PI) / 180;
 
@@ -48,8 +53,10 @@ export function HuePicker({
         else if (event.key === "End") onValueChange(359);
         else return;
         event.preventDefault();
+        if (!event.repeat) play("snap");
       }}
       onPointerDown={(event) => {
+        onSoundPointerDown(event);
         updateHue(event);
         event.currentTarget.setPointerCapture(event.pointerId);
       }}

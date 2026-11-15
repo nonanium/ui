@@ -1,5 +1,7 @@
 "use client";
 
+import { useInteractionSound, type SoundProps } from "../sounds";
+
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -30,16 +32,24 @@ const toggleVariants = cva(
 
 function Toggle({
   className,
+  sound,
+  onClick,
   variant = "default",
   size = "default",
   ...props
-}: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) {
+}: TogglePrimitive.Props & VariantProps<typeof toggleVariants> & SoundProps) {
+  const play = useInteractionSound("toggle", sound);
+
   return (
     <TogglePrimitive
       data-slot="toggle"
       data-variant={variant}
       data-size={size}
       className={cn(toggleVariants({ variant, size, className }))}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented && !props.disabled) play("toggle");
+      }}
       {...props}
     />
   );

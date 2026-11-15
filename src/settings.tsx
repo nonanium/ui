@@ -7,10 +7,12 @@ import {
   type ReactNode,
 } from "react";
 import type { TimestampStyle } from "./markdown/timestamps/format";
+import type { SoundConfig } from "./sounds";
 
 export type NonaniumStorage = Pick<Storage, "getItem" | "setItem">;
 
 export type NonaniumSettings = {
+  sounds?: SoundConfig;
   locale?: string;
   timeZone?: string;
   timestamps?: {

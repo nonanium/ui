@@ -4,6 +4,8 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "../../cmp/button";
 import { Input } from "../../cmp/input";
 import { Label } from "../../cmp/label";
+import { LabeledSwitch } from "../../cmp/settings-fields";
+import { useNonaniumSettings } from "../../settings";
 import {
   Select,
   SelectContent,
@@ -98,6 +100,9 @@ function FontSelect({
 
 export function ThemeCustomizer() {
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const soundId = useId();
+  const typingSoundId = useId();
+  const { settings, updateSettings } = useNonaniumSettings();
   const fontId = useId();
   const monoFontId = useId();
   const titleId = useId();
@@ -113,7 +118,59 @@ export function ThemeCustomizer() {
     <div className="w-full min-w-0 space-y-7">
       <div className="flex flex-col gap-5">
         <ThemeSelector />
-        <PolarityPicker />
+        <div className="flex flex-wrap items-end gap-5">
+          <PolarityPicker />
+          <div className="pb-1.5">
+            <LabeledSwitch
+              id={soundId}
+              label="Interaction sounds"
+              checked={settings.sounds?.enabled === true}
+              onCheckedChange={(enabled) =>
+                updateSettings({ sounds: { ...settings.sounds, enabled } })
+              }
+            />
+          </div>
+          <div className="pb-1.5">
+            <LabeledSwitch
+              id={typingSoundId}
+              label="Typing sounds"
+              checked={settings.sounds?.typingEnabled === true}
+              onCheckedChange={(typingEnabled) =>
+                updateSettings({
+                  sounds: { ...settings.sounds, typingEnabled },
+                })
+              }
+            />
+          </div>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <LabeledSlider
+            label="Sound volume"
+            value={Math.round((settings.sounds?.volume ?? 0.25) * 100)}
+            min={0}
+            max={100}
+            step={1}
+            formatValue={(value) => `${value}%`}
+            onValueChange={(value) =>
+              updateSettings({
+                sounds: { ...settings.sounds, volume: value / 100 },
+              })
+            }
+          />
+          <LabeledSlider
+            label="Typing volume"
+            value={Math.round((settings.sounds?.typingVolume ?? 0.35) * 100)}
+            min={0}
+            max={100}
+            step={1}
+            formatValue={(value) => `${value}%`}
+            onValueChange={(value) =>
+              updateSettings({
+                sounds: { ...settings.sounds, typingVolume: value / 100 },
+              })
+            }
+          />
+        </div>
         {!isBuiltin && (
           <>
             <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">

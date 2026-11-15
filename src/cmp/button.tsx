@@ -1,3 +1,4 @@
+import { useInteractionSound, type SoundProps } from "../sounds";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -36,10 +37,14 @@ const buttonVariants = cva(
 
 function Button({
   className,
+  sound,
+  onClick,
   variant = "default",
   size = "default",
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & SoundProps) {
+  const play = useInteractionSound("button", sound);
+
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -47,6 +52,10 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented && !props.disabled) play("press");
+      }}
       {...props}
     />
   );

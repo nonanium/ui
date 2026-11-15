@@ -13,6 +13,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { cn } from "../../lib/utils";
+import { useInteractionSound } from "../../sounds";
 import { useNonaniumSettings, type NonaniumSettings } from "../../settings";
 import { createTimestampExtensions, TIMESTAMP_HINT_ID } from "./timestamps";
 import { timestampToken, type TimestampStyle } from "../timestamps/format";
@@ -74,6 +75,11 @@ function toCssPadding(
 }
 
 export default function Input(props: InputProps) {
+  const play = useInteractionSound("typing");
+  const playRef = useRef(play);
+  useEffect(() => {
+    playRef.current = play;
+  }, [play]);
   const [links, setLinks] = useState<
     { element: HTMLElement; content: ReactNode; key: number }[]
   >([]);
@@ -146,6 +152,24 @@ export default function Input(props: InputProps) {
     const state = EditorState.create({
       doc: props.value,
       extensions: [
+        EditorView.updateListener.of((update) => {
+          if (
+            !update.docChanged ||
+            !update.view.hasFocus ||
+            update.view.composing
+          )
+            return;
+          if (
+            update.transactions.some(
+              (transaction) =>
+                transaction.annotation(externalValueSync) !== true &&
+                (transaction.isUserEvent("input.type") ||
+                  transaction.isUserEvent("delete.backward") ||
+                  transaction.isUserEvent("delete.forward")),
+            )
+          )
+            playRef.current("typing");
+        }),
         linkDecorations(
           (url) => renderLinkRef.current?.(url),
           mountLink,

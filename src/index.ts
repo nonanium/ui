@@ -9,6 +9,7 @@ export { toast } from "sonner";
 export * from "./theme";
 export * from "./provider";
 export * from "./settings";
+export * from "./sounds";
 export * from "./cmp/hint";
 export * from "./cmp/date-time-picker";
 export * from "./screens/util";

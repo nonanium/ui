@@ -1,4 +1,6 @@
 import * as React from "react";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useTypingSound, type SoundProps } from "../sounds";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
@@ -14,15 +16,19 @@ const textareaVariants = cva(
 
 function Textarea({
   className,
+  sound,
   variant = "outline",
   ...props
-}: React.ComponentProps<"textarea"> & VariantProps<typeof textareaVariants>) {
+}: React.ComponentProps<"textarea"> &
+  VariantProps<typeof textareaVariants> &
+  SoundProps) {
+  const onInput = useTypingSound(sound);
   return (
     <textarea
       data-slot="textarea"
       data-variant={variant}
       className={cn(textareaVariants({ variant }), className)}
-      {...props}
+      {...mergeProps({ onInput }, props)}
     />
   );
 }

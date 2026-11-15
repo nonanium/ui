@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useInteractionSound, type SoundProps } from "../sounds";
 import { Select as SelectPrimitive } from "@base-ui/react/select";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -10,10 +11,12 @@ import { controlVariantClasses } from "./control-variants";
 import { OverlayContext, useListboxBack } from "../hooks/use-overlay-back";
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react";
 
-function Select<Value, Multiple extends boolean | undefined = false>(
-  props: SelectPrimitive.Root.Props<Value, Multiple>,
-) {
+function Select<Value, Multiple extends boolean | undefined = false>({
+  sound,
+  ...props
+}: SelectPrimitive.Root.Props<Value, Multiple> & SoundProps) {
   const { overlay, open, setOpen } = useListboxBack(props);
+  const play = useInteractionSound("select", sound);
   return (
     <OverlayContext value={overlay}>
       <SelectPrimitive.Root
@@ -21,7 +24,14 @@ function Select<Value, Multiple extends boolean | undefined = false>(
         open={open}
         onOpenChange={(next, details) => {
           props.onOpenChange?.(next, details);
-          if (!details.isCanceled) setOpen(next);
+          if (!details.isCanceled) {
+            setOpen(next);
+            if (next && details.reason !== "none") play("press");
+          }
+        }}
+        onValueChange={(value, details) => {
+          props.onValueChange?.(value, details);
+          if (!details.isCanceled && details.reason !== "none") play("snap");
         }}
       />
     </OverlayContext>

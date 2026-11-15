@@ -1,3 +1,5 @@
+import { useInteractionSoundHandlers, type SoundProps } from "../sounds";
+import { mergeProps } from "@base-ui/react/merge-props";
 import { useId, type ComponentProps, type ReactNode } from "react";
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 
@@ -6,17 +8,20 @@ import { Label } from "./label";
 
 function Slider({
   className,
+  sound,
   defaultValue,
   value,
   min = 0,
   max = 100,
   ...props
-}: SliderPrimitive.Root.Props) {
+}: SliderPrimitive.Root.Props & SoundProps) {
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
       ? defaultValue
       : [min, max];
+
+  const soundHandlers = useInteractionSoundHandlers("slider", sound);
 
   return (
     <SliderPrimitive.Root
@@ -27,7 +32,7 @@ function Slider({
       min={min}
       max={max}
       thumbAlignment="edge"
-      {...props}
+      {...mergeProps(soundHandlers, props)}
     >
       <SliderPrimitive.Control className="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col">
         <SliderPrimitive.Track

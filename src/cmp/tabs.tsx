@@ -1,13 +1,17 @@
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
+import { useInteractionSound, type SoundProps } from "../sounds";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
 
 function Tabs({
   className,
+  sound,
+  onValueChange,
   orientation = "horizontal",
   ...props
-}: TabsPrimitive.Root.Props) {
+}: TabsPrimitive.Root.Props & SoundProps) {
+  const play = useInteractionSound("tabs", sound);
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
@@ -17,6 +21,10 @@ function Tabs({
         className,
       )}
       {...props}
+      onValueChange={(value, details) => {
+        onValueChange?.(value, details);
+        if (!details.isCanceled && details.reason === "none") play("snap");
+      }}
     />
   );
 }
