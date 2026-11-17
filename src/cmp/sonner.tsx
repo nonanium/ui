@@ -1,7 +1,9 @@
 "use client";
 
 import { useTheme } from "../theme/Provider";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { useEffect, useRef } from "react";
+import { Toaster as Sonner, useSonner, type ToasterProps } from "sonner";
+import { useInteractionSound } from "../sounds";
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -12,6 +14,22 @@ import {
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { resolvedPolarity } = useTheme();
+  const { toasts } = useSonner();
+  const play = useInteractionSound("toast");
+  const previousErrors = useRef(new Set<string | number>());
+
+  useEffect(() => {
+    const errors = new Set(
+      toasts
+        .filter(
+          (toast) => toast.type === "error" && toast.toasterId === props.id,
+        )
+        .map((toast) => toast.id),
+    );
+    if ([...errors].some((id) => !previousErrors.current.has(id)))
+      play("error");
+    previousErrors.current = errors;
+  }, [toasts, props.id, play]);
 
   return (
     <Sonner

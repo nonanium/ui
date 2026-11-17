@@ -23,6 +23,7 @@ export type SoundComponent =
   | "drag"
   | "select"
   | "tabs"
+  | "toast"
   | "typing";
 
 export type SoundConfig = {

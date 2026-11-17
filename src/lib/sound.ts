@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-export type InteractionSound = "press" | "toggle" | "snap" | "typing";
+export type InteractionSound = "press" | "toggle" | "snap" | "typing" | "error";
 
 let context: AudioContext | undefined;
 let output: BiquadFilterNode | undefined;
@@ -47,7 +47,7 @@ export async function playSound(voice: InteractionSound, volume: number) {
     !navigator.userActivation.isActive
   )
     return;
-  if (performance.now() - lastPlayed < 35) return;
+  if (voice !== "error" && performance.now() - lastPlayed < 35) return;
 
   try {
     if (!context || context.state === "closed") {
@@ -76,9 +76,37 @@ export async function playSound(voice: InteractionSound, volume: number) {
       await c.resume();
       if (performance.now() - requestedAt > 100 || document.hidden) return;
     }
-    if (performance.now() - lastPlayed < 35) return;
+    if (voice !== "error" && performance.now() - lastPlayed < 35) return;
     lastPlayed = performance.now();
     const at = c.currentTime + 0.002;
+    if (voice === "error") {
+      // Keep the soft sine body of the interaction sounds, with a descending pair for errors.
+      for (const [index, frequency] of [180, 150].entries()) {
+        const start = at + index * 0.09;
+        const duration = index === 0 ? 0.065 : 0.085;
+        const oscillator = c.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, start);
+        oscillator.frequency.exponentialRampToValueAtTime(
+          frequency * 0.85,
+          start + duration,
+        );
+        const gain = c.createGain();
+        const level = Math.min(1, volume) * 0.045;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(level, start + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.00001, start + duration);
+        gain.gain.linearRampToValueAtTime(0, start + duration + 0.01);
+        oscillator.connect(gain).connect(output!);
+        oscillator.onended = () => {
+          oscillator.disconnect();
+          gain.disconnect();
+        };
+        oscillator.start(start);
+        oscillator.stop(start + duration + 0.015);
+      }
+      return;
+    }
     const snap = voice === "snap";
     const typing = voice === "typing";
     // Vary the body, contact and envelope while keeping each voice recognizable.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Blocks, Home, Palette, Settings } from "lucide-react";
 import {
   Button,
@@ -35,9 +35,11 @@ import {
   TabsTrigger,
   ThemeCustomizer,
   ThemeOnboardingPage,
+  Toaster,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  toast,
   type OnboardingStep,
 } from "@nonanium/ui";
 
@@ -75,6 +77,17 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [errorToastPending, setErrorToastPending] = useState(false);
+
+  useEffect(() => {
+    if (!errorToastPending) return;
+    const timeout = window.setTimeout(() => {
+      toast.error("This is a demo error.");
+      setErrorToastPending(false);
+    }, 1000);
+    return () => window.clearTimeout(timeout);
+  }, [errorToastPending]);
+
   const steps: OnboardingStep[] = [
     {
       id: "welcome",
@@ -135,6 +148,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
+      <Toaster />
       <Sidebar
         collapsible="none"
         className="h-auto! min-h-svh self-stretch border-r"
@@ -221,6 +235,13 @@ export default function App() {
             </Button>
             <Button variant="destructive" onClick={() => setShowError(true)}>
               Open error screen
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={errorToastPending}
+              onClick={() => setErrorToastPending(true)}
+            >
+              {errorToastPending ? "Show error toast in 1s" : "Show error toast"}
             </Button>
           </div>
           <ThemeCustomizer />
