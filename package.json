@@ -1,6 +1,6 @@
 {
     "name": "@nonanium/ui",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "license": "SEE LICENSE IN LICENSE",
     "type": "module",
     "main": "./dist/index.js",
@@ -14,6 +14,71 @@
         "./dist/excalidraw/excalidraw.css"
     ],
     "exports": {
+        "./control-variants": {
+            "types": "./dist/cmp/control-variants.d.ts",
+            "import": "./dist/cmp/control-variants.js",
+            "default": "./dist/cmp/control-variants.js"
+        },
+        "./alert": {
+            "types": "./dist/cmp/alert.d.ts",
+            "import": "./dist/cmp/alert.js",
+            "default": "./dist/cmp/alert.js"
+        },
+        "./label": {
+            "types": "./dist/cmp/label.d.ts",
+            "import": "./dist/cmp/label.js",
+            "default": "./dist/cmp/label.js"
+        },
+        "./separator": {
+            "types": "./dist/cmp/separator.d.ts",
+            "import": "./dist/cmp/separator.js",
+            "default": "./dist/cmp/separator.js"
+        },
+        "./table": {
+            "types": "./dist/cmp/table.d.ts",
+            "import": "./dist/cmp/table.js",
+            "default": "./dist/cmp/table.js"
+        },
+        "./checkbox": {
+            "types": "./dist/cmp/checkbox.d.ts",
+            "import": "./dist/cmp/checkbox.js",
+            "default": "./dist/cmp/checkbox.js"
+        },
+        "./switch": {
+            "types": "./dist/cmp/switch.d.ts",
+            "import": "./dist/cmp/switch.js",
+            "default": "./dist/cmp/switch.js"
+        },
+        "./radio-group": {
+            "types": "./dist/cmp/radio-group.d.ts",
+            "import": "./dist/cmp/radio-group.js",
+            "default": "./dist/cmp/radio-group.js"
+        },
+        "./badge": {
+            "types": "./dist/cmp/badge.d.ts",
+            "import": "./dist/cmp/badge.js",
+            "default": "./dist/cmp/badge.js"
+        },
+        "./input": {
+            "types": "./dist/cmp/input.d.ts",
+            "import": "./dist/cmp/input.js",
+            "default": "./dist/cmp/input.js"
+        },
+        "./textarea": {
+            "types": "./dist/cmp/textarea.d.ts",
+            "import": "./dist/cmp/textarea.js",
+            "default": "./dist/cmp/textarea.js"
+        },
+        "./button": {
+            "types": "./dist/cmp/button.d.ts",
+            "import": "./dist/cmp/button.js",
+            "default": "./dist/cmp/button.js"
+        },
+        "./skeleton": {
+            "types": "./dist/cmp/skeleton.d.ts",
+            "import": "./dist/cmp/skeleton.js",
+            "default": "./dist/cmp/skeleton.js"
+        },
         ".": {
             "types": "./dist/index.d.ts",
             "node": "./dist/node.js",
@@ -54,7 +119,8 @@
         "dev": "pnpm --filter @nonanium/ui-showcase dev",
         "lint": "pnpm --filter @nonanium/ui-showcase lint",
         "update:twemoji": "node scripts/update-twemoji.mjs",
-        "prepack": "pnpm run build",
+        "test:exports": "node --test scripts/package-exports.test.mjs",
+        "prepack": "pnpm run build && pnpm run test:exports",
         "postpack": "node -e \"const fs=require('node:fs');const pkg=require('./package.json');const from=pkg.name.replace(/^@/,'').replace(/[\\\\/]/g,'-')+'-'+pkg.version+'.tgz';fs.renameSync(from,'nonanium-ui.tgz')\"",
         "format": "pnpm exec prettier --write ."
     },

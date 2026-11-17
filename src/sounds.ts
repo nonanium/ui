@@ -8,10 +8,10 @@ import {
   type PointerEvent,
   type SyntheticEvent,
 } from "react";
-import { useNonaniumSettings } from "./settings";
-import { playSound, type InteractionSound } from "./lib/sound";
+import { useNonaniumSettings } from "./settings.js";
+import { playSound, type InteractionSound } from "./lib/sound.js";
 
-export type { InteractionSound } from "./lib/sound";
+export type { InteractionSound } from "./lib/sound.js";
 
 // Override volume multiplies the global volume, so the global level remains a ceiling.
 export type SoundOverride = boolean | { enabled?: boolean; volume?: number };

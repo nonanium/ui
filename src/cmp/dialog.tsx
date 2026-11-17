@@ -5,6 +5,7 @@ import { cn } from "../lib/utils";
 import { Button } from "./button";
 import { XIcon } from "lucide-react";
 import { OverlayContext, useOverlayRoot } from "../hooks/use-overlay-back";
+import { dialogRecipes } from "./control-variants";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   const { overlay, ...backProps } = useOverlayRoot(props);
@@ -35,7 +36,8 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/50 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        dialogRecipes.overlay,
+        "fixed inset-0 z-50 bg-black/50 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className,
       )}
       {...props}
@@ -89,7 +91,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn(dialogRecipes.header, className)}
       {...props}
     />
   );
@@ -107,7 +109,8 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl bg-muted/50 p-4 sm:flex-row sm:justify-end",
+        dialogRecipes.footer,
+        "-mx-4 -mb-4 rounded-b-xl bg-muted/50 p-4",
         className,
       )}
       {...props}
@@ -127,7 +130,8 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-base leading-none font-medium",
+        dialogRecipes.title,
+        "text-base font-medium",
         className,
       )}
       {...props}
@@ -143,7 +147,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        dialogRecipes.description,
         className,
       )}
       {...props}

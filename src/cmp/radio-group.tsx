@@ -1,7 +1,10 @@
+import { cva } from "class-variance-authority";
 import { Radio as RadioPrimitive } from "@base-ui/react/radio";
 import { RadioGroup as RadioGroupPrimitive } from "@base-ui/react/radio-group";
 
-import { cn } from "../lib/utils";
+import { cn } from "../lib/utils.js";
+
+const radioRootVariants = cva("group/radio-group-item peer relative flex aspect-square size-4 shrink-0 rounded-full border-0! bg-input/30 bg-none! outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary");
 
 function RadioGroup({ className, ...props }: RadioGroupPrimitive.Props) {
   return (
@@ -18,7 +21,7 @@ function RadioGroupItem({ className, ...props }: RadioPrimitive.Root.Props) {
     <RadioPrimitive.Root
       data-slot="radio-group-item"
       className={cn(
-        "group/radio-group-item peer relative flex aspect-square size-4 shrink-0 rounded-full border-0! bg-input/30 bg-none! outline-none after:absolute after:-inset-x-3 after:-inset-y-2 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary",
+        radioRootVariants(),
         className,
       )}
       {...props}
@@ -33,4 +36,4 @@ function RadioGroupItem({ className, ...props }: RadioPrimitive.Root.Props) {
   );
 }
 
-export { RadioGroup, RadioGroupItem };
+export { RadioGroup, RadioGroupItem, radioRootVariants };

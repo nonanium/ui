@@ -1,10 +1,10 @@
 import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
-import { useTypingSound, type SoundProps } from "../sounds";
+import { useTypingSound, type SoundProps } from "../sounds.js";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../lib/utils";
-import { controlVariantClasses } from "./control-variants";
+import { cn } from "../lib/utils.js";
+import { controlVariantClasses } from "./control-variants.js";
 
 const textareaVariants = cva(
   "flex field-sizing-content min-h-16 w-full rounded-lg border-0! px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:aria-invalid:ring-destructive/40",

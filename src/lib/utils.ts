@@ -10,5 +10,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-import { useIsMobile } from "../hooks/use-mobile";
+import { useIsMobile } from "../hooks/use-mobile.js";
 export { useIsMobile };

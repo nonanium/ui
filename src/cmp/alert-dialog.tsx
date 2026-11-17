@@ -6,6 +6,7 @@ import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog
 import { cn } from "../lib/utils";
 import { Button } from "./button";
 import { OverlayContext, useOverlayRoot } from "../hooks/use-overlay-back";
+import { dialogRecipes } from "./control-variants";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   const { overlay, ...backProps } = useOverlayRoot(props);
@@ -40,7 +41,8 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/50 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        dialogRecipes.overlay,
+        "fixed inset-0 z-50 bg-black/50 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className,
       )}
       {...props}
@@ -143,7 +145,8 @@ function AlertDialogDescription({
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
       className={cn(
-        "text-sm text-balance text-muted-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        dialogRecipes.description,
+        "text-balance md:text-pretty",
         className,
       )}
       {...props}
